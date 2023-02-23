@@ -13,7 +13,7 @@
 #ifndef PHILO_H
 # define PHILO_H
 
-#include <pthread.h>
+# include <pthread.h>
 
 typedef struct s_data
 {

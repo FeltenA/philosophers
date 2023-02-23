@@ -55,22 +55,35 @@ int	parse_input(int argc, const char *argv, t_data *data)
 
 int	create_philo(t_data *data)
 {
+	int	i;
+
+	i = -1;
 	data->philos = malloc(sizeof(pthread_t) * data->n_philo);
 	data->forks = malloc(sizeof(pthread_mutex_t) * data->n_philo);
 	if (!data->philos || !data->forks)
 		return (0);
-	while (i < data->n_philo)
+	while (++i < data->n_philo)
 	{
-		data->philos[i] = 
+		if (pthread_create(&data->philo[i], 0, philospher, philosopher_data))
+			return (0);
+		if (pthread_mutex_init(&data->forks[i], 0))
+			return (0);
 	}
 }
 
 int	main(int argc, const char *argv[])
 {
 	t_data	data;
+	int		i;
 
 	if (argc < 5 || argc > 6)
 		return (1);
-	if (parse_input(argc, argv, &data));
+	if (parse_input(argc, argv, &data))
 		return (1);
+	if (!create_philo(&data))
+		return (1);
+	i = -1;
+	while (++i < data->n_philo)
+		pthread_join(data->philo[i], 0);
+	return (0);
 }
