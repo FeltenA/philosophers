@@ -14,16 +14,33 @@
 # define PHILO_H
 
 # include <pthread.h>
+# include <sys/time.h>
+
+struct	s_data;
+
+typedef struct s_philo
+{
+	int					id;
+	int					nb_eat;
+	struct timeval		t_eat;
+	pthread_mutex_t		check;
+	struct s_data		*data;
+}	t_philo;
 
 typedef struct s_data
 {
-	int				n_philo;
-	int				t_die;
-	int				t_eat;
-	int				t_sleep;
-	int				n_eat;
-	pthread_t		*philos;
-	pthread_mutex_t	*forks;
+	int					nb_philo;
+	int					t_die;
+	int					t_eat;
+	int					t_sleep;
+	int					n_eat;
+	int					died;
+	unsigned long long	t_start;
+	t_philo				*philos;
+	pthread_t			*philos_t;
+	pthread_mutex_t		*forks;
+	pthread_mutex_t		write;
+	pthread_mutex_t		check;
 }	t_data;
 
 #endif

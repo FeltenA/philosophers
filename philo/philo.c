@@ -11,64 +11,66 @@
 /* ************************************************************************** */
 
 #include "philo.h"
+#include <stdlib.h>
 
-int	get_nbr(const char *str)
+int	init_data(t_data *data);
+int	launch_philos(t_data *data);
+int	get_nbr(const char *str);
+
+int	parse_input(int argc, const char *argv[], t_data *data)
 {
-	int	nbr;
-	int	neg;
-
-	nbr = 0;
-	neg = 1;
-	if (*str == '+' || *str == '-')
-	{
-		if (*str == '-')
-			neg = -1;
-		str++;
-	}
-	while (*str >= '0' && *str <= '9')
-	{
-		nbr = nbr * 10 + *str - 48;
-		str++;
-	}
-	if (*str != '\0')
-		return (-1);
-	return (nbr * neg);
-}
-
-int	parse_input(int argc, const char *argv, t_data *data)
-{
-	data->n_philo = get_nbr(argv[1]);
+	data->nb_philo = get_nbr(argv[1]);
 	data->t_die = get_nbr(argv[2]);
 	data->t_eat = get_nbr(argv[3]);
 	data->t_sleep = get_nbr(argv[4]);
-	if (data->n_philo < 0 || data->t_die < 0 || data->t_eat < 0
-		|| data->sleep < 0)
+	if (data->nb_philo <= 0 || data->t_die <= 0 || data->t_eat <= 0
+		|| data->t_sleep <= 0)
 		return (0);
 	if (argc == 6)
 		data->n_eat = get_nbr(argv[5]);
 	else
 		data->n_eat = -1;
-	if (data->n_eat < 0 && argc == 6)
+	if (argc == 6 && data->n_eat <= 0)
 		return (0);
 	return (1);
 }
 
-int	create_philo(t_data *data)
+int	destroy_forks(pthread_mutex_t *forks, int n)
 {
 	int	i;
 
 	i = -1;
-	data->philos = malloc(sizeof(pthread_t) * data->n_philo);
-	data->forks = malloc(sizeof(pthread_mutex_t) * data->n_philo);
-	if (!data->philos || !data->forks)
-		return (0);
-	while (++i < data->n_philo)
-	{
-		if (pthread_create(&data->philo[i], 0, philospher, philosopher_data))
-			return (0);
-		if (pthread_mutex_init(&data->forks[i], 0))
-			return (0);
-	}
+	while (++i < n)
+		pthread_mutex_destroy(&forks[i]);
+	free(forks);
+	return (0);
+}
+
+int	destroy_philos(t_philo *philos, int n)
+{
+	int	i;
+
+	i = -1;
+	while (++i < n)
+		pthread_mutex_destroy(&philos[i].check);
+	free(philos);
+	return (0);
+}
+
+int	destroy_all(t_data *data, int type, int n)
+{
+	pthread_mutex_destroy(&data->write);
+	if (type > 0)
+		pthread_mutex_destroy(&data->check);
+	if (type == 2)
+		destroy_forks(data->forks, n);
+	else if (type > 2)
+		destroy_forks(data->forks, data->nb_philo);
+	if (type > 2)
+		destroy_philos(data->philos, n);
+	if (type > 3)
+		free(data->philos_t);
+	return (0);
 }
 
 int	main(int argc, const char *argv[])
@@ -78,12 +80,15 @@ int	main(int argc, const char *argv[])
 
 	if (argc < 5 || argc > 6)
 		return (1);
-	if (parse_input(argc, argv, &data))
+	if (!parse_input(argc, argv, &data))
 		return (1);
-	if (!create_philo(&data))
+	if (!init_data(&data))
+		return (1);
+	if (!launch_philos(&data))
 		return (1);
 	i = -1;
-	while (++i < data->n_philo)
-		pthread_join(data->philo[i], 0);
+	while (++i < data.nb_philo)
+		pthread_join(data.philos_t[i], 0);
+	destroy_all(&data, 4, data.nb_philo);
 	return (0);
 }
