@@ -60,3 +60,13 @@ void	check_dead(t_data *data, int id)
 		philo_print(&data->philos[id], time, "died", 1);
 	}
 }
+
+int	print_err(const char *str)
+{
+	int	i;
+
+	while (str[i])
+		i++;
+	write(2, str, i);
+	return (1);
+}

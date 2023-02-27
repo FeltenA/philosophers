@@ -16,6 +16,7 @@
 int	init_data(t_data *data);
 int	launch_philos(t_data *data);
 int	get_nbr(const char *str);
+int	print_err(const char *str);
 
 int	parse_input(int argc, const char *argv[], t_data *data)
 {
@@ -79,13 +80,13 @@ int	main(int argc, const char *argv[])
 	int		i;
 
 	if (argc < 5 || argc > 6)
-		return (1);
+		return (print_err("Incorrect number of arguments\n"));
 	if (!parse_input(argc, argv, &data))
-		return (1);
+		return (print_err("Incorrect arguments\n"));
 	if (!init_data(&data))
-		return (1);
+		return (print_err("Error in initialisation\n"));
 	if (!launch_philos(&data))
-		return (1);
+		return (print_err("Error in thread creation\n"));
 	i = -1;
 	while (++i < data.nb_philo)
 		pthread_join(data.philos_t[i], 0);
