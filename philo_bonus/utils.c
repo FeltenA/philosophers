@@ -1,8 +1,8 @@
 
-#include "philo.h"
+#include "philo_bonus.h"
 #include <unistd.h>
 
-int	philo_print(t_philo *philo, struct timeval time, const char *str, int type);
+int	philo_print(t_philo *philo, struct timeval time, const char *str);
 
 int	get_nbr(const char *str)
 {
@@ -44,22 +44,6 @@ int	check_time(t_philo *philo)
 			&& time.tv_usec > t_eat.tv_usec))
 		return (1);
 	return (0);
-}
-
-void	check_dead(t_data *data, int id)
-{
-	struct timeval	time;
-
-	if ((data->n_eat < 0 || (data->n_eat > 0
-				&& data->philos[id].nb_eat < data->n_eat))
-		&& check_time(&data->philos[id]))
-	{
-		pthread_mutex_lock(&data->check);
-		data->died = 1;
-		pthread_mutex_unlock(&data->check);
-		gettimeofday(&time, 0);
-		philo_print(&data->philos[id], time, "died", 1);
-	}
 }
 
 int	print_err(const char *str)

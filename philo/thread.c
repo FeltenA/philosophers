@@ -47,13 +47,18 @@ void	take_forks(t_philo *philo)
 {
 	struct timeval	time;
 
-	if (philo->id == philo->data->nb_philo - 1)
+	if (philo->data->nb_philo > 1 && philo->id == philo->data->nb_philo - 1)
 		pthread_mutex_lock(
 			&philo->data->forks[(philo->id + 1) % philo->data->nb_philo]);
 	else
 		pthread_mutex_lock(&philo->data->forks[philo->id]);
 	gettimeofday(&time, 0);
 	philo_print(philo, time, "has taken a fork", 0);
+	if (philo->data->nb_philo == 1)
+	{
+		usleep((philo->data->t_die + 20) * 1000);
+		return ;
+	}
 	if (philo->id == philo->data->nb_philo - 1)
 		pthread_mutex_lock(&philo->data->forks[philo->id]);
 	else
@@ -76,8 +81,9 @@ void	*philosopher(void *philo_v)
 		take_forks(philo);
 		philo_eat(philo);
 		pthread_mutex_unlock(&philo->data->forks[philo->id]);
-		pthread_mutex_unlock(
-			&philo->data->forks[(philo->id + 1) % philo->data->nb_philo]);
+		if (philo->data->nb_philo > 1)
+			pthread_mutex_unlock(
+				&philo->data->forks[(philo->id + 1) % philo->data->nb_philo]);
 		gettimeofday(&time, 0);
 		if (philo_print(philo, time, "is sleeping", 0))
 			break ;
