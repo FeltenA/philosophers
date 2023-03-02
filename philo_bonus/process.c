@@ -90,5 +90,7 @@ void	philosopher(t_philo *philo)
 		if (philo->data->nb_philo % 2)
 			usleep(10000);
 	}
+	while (1)
+		usleep(50000);
 	exit(0);
 }

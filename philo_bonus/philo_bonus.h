@@ -28,6 +28,7 @@ typedef struct s_data
 	int					t_sleep;
 	int					n_eat;
 	unsigned long long	t_start;
+	pid_t				p_eaten;
 	sem_t				*write;
 	sem_t				*finish;
 	sem_t				*eaten;

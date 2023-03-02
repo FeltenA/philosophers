@@ -56,9 +56,13 @@ int	destroy_all(t_data *data, int type, int n)
 	if (type == 3)
 	{
 		i = -1;
+		if (data->n_eat > 0)
+			kill(data->p_eaten, SIGKILL);
 		while (++i < n)
 			kill(data->philos[i].pid, SIGKILL);
 		i = -1;
+		if (data->n_eat > 0)
+			waitpid(data->p_eaten, &status, 0);
 		while (++i < n)
 			waitpid(data->philos[i].pid, &status, 0);
 	}

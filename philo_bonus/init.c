@@ -9,34 +9,35 @@ int		philo_print(t_philo *philo, struct timeval time,
 int		destroy_all(t_data *data, int type, int n);
 char	*ft_itoa(int n);
 
-void	*check_eaten(void *arg)
+int	check_eaten(t_data *data)
 {
-	t_data	*data;
 	int		i;
 
-	data = (t_data *)arg;
 	i = -1;
-	while (++i < data->nb_philo)
-		sem_wait(data->eaten);
-	sem_post(data->finish);
+	data->p_eaten = fork();
+	if (data->p_eaten < 0)
+		return (0);
+	if (!data->p_eaten)
+	{
+		while (++i < data->nb_philo)
+			sem_wait(data->eaten);
+		sem_post(data->finish);
+		while (1)
+			usleep(50000);
+	}
 	return (0);
 }
 
 int	launch_philos(t_data *data)
 {
 	int				i;
-	pthread_t		eaten;
 	struct timeval	time;
 
 	i = -1;
 	gettimeofday(&time, 0);
 	data->t_start = time.tv_sec * 1000 + time.tv_usec / 1000;
-	if (data->n_eat > 0)
-	{
-		if (pthread_create(&eaten, 0, check_eaten, data))
-			return (destroy_all(data, 2, data->nb_philo));
-		pthread_detach(eaten);
-	}
+	if (data->n_eat > 0 && check_eaten(data))
+		return (destroy_all(data, 3, i));
 	while (++i < data->nb_philo)
 	{
 		data->philos[i].pid = fork();
