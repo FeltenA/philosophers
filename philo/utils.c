@@ -17,25 +17,25 @@ int	philo_print(t_philo *philo, struct timeval time, const char *str, int type);
 
 int	get_nbr(const char *str)
 {
-	int	nbr;
-	int	neg;
+	long int	nbr;
 
 	nbr = 0;
-	neg = 1;
 	if (*str == '+' || *str == '-')
 	{
 		if (*str == '-')
-			neg = -1;
+			return (-1);
 		str++;
 	}
 	while (*str >= '0' && *str <= '9')
 	{
 		nbr = nbr * 10 + *str - 48;
+		if (nbr > 2147483647)
+			return (-1);
 		str++;
 	}
 	if (*str != '\0')
 		return (-1);
-	return (nbr * neg);
+	return (nbr);
 }
 
 int	check_time(t_philo *philo)

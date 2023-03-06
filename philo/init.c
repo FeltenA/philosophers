@@ -27,14 +27,13 @@ void	check_end(t_data *data)
 
 	i = 0;
 	eaten = 0;
-	usleep(data->t_die * 1000);
 	while (!data->died && eaten < data->nb_philo)
 	{
 		if (i == data->nb_philo)
 		{
 			eaten = 0;
 			i = 0;
-			usleep(5000);
+			usleep(1000);
 		}
 		pthread_mutex_lock(&data->philos[i].check);
 		check_dead(data, i);

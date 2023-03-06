@@ -26,7 +26,7 @@ int	parse_input(int argc, const char *argv[], t_data *data)
 	data->t_eat = get_nbr(argv[3]);
 	data->t_sleep = get_nbr(argv[4]);
 	if (data->nb_philo <= 0 || data->t_die <= 0 || data->t_eat <= 0
-		|| data->t_sleep <= 0)
+		|| data->t_sleep <= 0 || data->nb_philo > 200)
 		return (0);
 	if (argc == 6)
 		data->n_eat = get_nbr(argv[5]);
